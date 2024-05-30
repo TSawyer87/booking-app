@@ -1,16 +1,21 @@
 package main
 
 import (
-	"booking-app/helper"
 	"fmt"
-	"strings"
 )
 
 const conferenceTickets int = 50
 
 var conferenceName = "Go Conference"
 var remainingTickets uint = 50
-var bookings []string
+var bookings = make([]UserData, 0)
+
+type UserData struct {
+	firstName       string
+	lastName        string
+	email           string
+	numberOfTickets uint
+}
 
 func main() {
 
@@ -19,12 +24,12 @@ func main() {
 	for {
 
 		firstName, lastName, email, userTickets := getUserInput()
-		isValidName, isValidEmail, isValidTicketNumber := helper.ValidateUserInput(firstName, lastName, email, userTickets, remainingTickets)
+		isValidName, isValidEmail, isValidTicketNumber := ValidateUserInput(firstName, lastName, email, userTickets, remainingTickets)
 
 		if isValidName && isValidEmail && isValidTicketNumber {
 			bookTicket(userTickets, firstName, lastName, email)
 			firstNames := getFirstNames()
-			fmt.Printf("The first names of the bookings are: %v\n", firstNames)
+			fmt.Printf("List of first names: %v\n", firstNames)
 
 			if remainingTickets == 0 {
 				// end program
@@ -56,8 +61,7 @@ func greetUsers() {
 func getFirstNames() []string {
 	firstNames := []string{}
 	for _, booking := range bookings {
-		var names = strings.Fields(booking)
-		firstNames = append(firstNames, names[0])
+		firstNames = append(firstNames, booking.firstName)
 	}
 	return firstNames
 }
@@ -86,7 +90,16 @@ func getUserInput() (string, string, string, uint) {
 func bookTicket(userTickets uint, firstName string, lastName string, email string) {
 
 	remainingTickets = remainingTickets - userTickets
-	bookings = append(bookings, firstName+" "+lastName)
+
+	var userData = UserData{
+		firstName:       firstName,
+		lastName:        lastName,
+		email:           email,
+		numberOfTickets: userTickets,
+	}
+
+	bookings = append(bookings, userData)
+	fmt.Printf("List of bookings: %v\n", bookings)
 
 	fmt.Printf("Thank you %v %v for booking %v tickets. You will recieve a conformation email at %v.\n", firstName, lastName, userTickets, email)
 	fmt.Printf("%v tickets remaining for the %v\n", remainingTickets, conferenceName)
